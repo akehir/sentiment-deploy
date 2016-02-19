@@ -1,0 +1,45 @@
+
+As a prerequiste to deploy on bluemix, it is necessary to install the CF cli, from the following git repository:
+https://github.com/cloudfoundry/cli
+
+
+Then, one needs to have a valid Bluemix account, and an organization / space defined for that Account (done via the website).
+Subsequently it is possible to either log into the EU or US  Bluemix via the correct API url.
+$ cf api https://api.ng.bluemix.net
+$ cf api https://api.eu-gb.bluemix.net 
+
+
+
+
+Once the API has been selected, one has to authenticate:
+$ cf login
+
+Next, we need to create the 4 services our apps use:
+$ cf create-service mongodb 100 sentiment-mongodb
+$ cf create-service MQLight standard sentiment-mq
+$ cf create-service Auto-Scaling free sentiment-autoscaling
+$ cf create-service MonitoringAndAnalytics Free sentiment-monitoring
+
+When the services are created, it is possible to deploy the applications by changing the directory to the 3 applications (optionally, 4 for the db admin interface) and using cf push. However, it is necessary to edit the “manifest.yml” before, in order to assign an unique url by changing the “host: “ line into something different
+$ cd sentiment-twitter
+$ vi manifest.yml
+$ cf push
+$ cd sentiment-frontend
+$ vi manifest.yml
+$ cf push
+$ cd sentiment-analysis
+$ vi manifest.yml
+$ cf push
+$ cd sentiment-aggregate
+$ vi manifest.yml
+$ cf push
+
+Now the applications should be running and accessible on the previously defined URL’s. What’s left is to define the autoscaling policies over the service interface in the Bluemix dashboard.
+For this, one logs onto the Bluemix Dashboard, selects the correct region and clicks on the Auto-Scaling Service in the overview.  In the service, one can edit the auto-scaling policies for every application - in our case it makes sense to automatically scale the aggregator application, the frontend application, and the analysis application. 
+
+
+This short guide on how to deploy applications to Bluemix demonstrates, how easy it is to deploy applications onto the service: Once an account has been registered, you only require a few short command-line directions in order to have a complex application running and publicly available.
+
+PS: For the application to work, valid twitter tokens for the specified URL also have to be provided.
+
+
